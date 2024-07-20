@@ -19,8 +19,12 @@ jobs:
       - name: Unpack FreeBSD image
         run: |
           sudo mkdir /mnt/freebsd
-          sudo xzcat /tmp/FreeBSD-13.2-RELEASE-arm64-aarch64-RPI.img.xz | sudo dd of=/mnt/freebsd status=progress bs=16M
-          sudo mount /mnt/freebsd
+          sudo xzcat /tmp/FreeBSD-13.2-RELEASE-arm64-aarch64-RPI.img.xz | sudo dd of=/mnt/freebsd/FreeBSD-image.img status=progress bs=16M
+
+      - name: Mount FreeBSD image
+        run: |
+          sudo losetup -f /dev/loop0 /mnt/freebsd/FreeBSD-image.img
+          sudo mount /dev/loop0 /mnt/freebsd
 
       - name: Chroot into FreeBSD
         run: |

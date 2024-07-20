@@ -3,7 +3,7 @@ name: Build FreeBSD for Raspberry Pi
 on:
   push:
     branches:
-      - main  # Testing
+      - master  # Testing
 
 jobs:
   build-freebsd:

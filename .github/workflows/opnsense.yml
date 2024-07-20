@@ -23,8 +23,7 @@ jobs:
 
       - name: Mount FreeBSD image
         run: |
-          sudo losetup -f /dev/loop0 /mnt/freebsd/FreeBSD-image.img
-          sudo mount /dev/loop0 /mnt/freebsd
+          sudo mount -o loop /mnt/freebsd/FreeBSD-image.img /mnt/freebsd
 
       - name: Chroot into FreeBSD
         run: |

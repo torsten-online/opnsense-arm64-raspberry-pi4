@@ -3,22 +3,28 @@ name: Build FreeBSD for Raspberry Pi
 on:
   push:
     branches:
-      - master  # Testing
+      - main  # Or your desired branch
 
 jobs:
   build-freebsd:
     runs-on: ubuntu-latest  # Or a suitable Linux runner
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Set up build environment
         run: |
           sudo apt update
           sudo apt install -y git wget xz-utils  # Install necessary tools
+
+      - name: Clone OPNsense tools
+        run: |
           sudo mkdir /usr/tools
           sudo git clone --depth=1 https://github.com/opnsense/tools.git /usr/tools
           sudo make -C /usr/tools update
+
+      - name: Install pkg
+        run: |
           cd /usr/ports/ports-mgmt/pkg/
           sudo make -j4
           sudo make reinstall

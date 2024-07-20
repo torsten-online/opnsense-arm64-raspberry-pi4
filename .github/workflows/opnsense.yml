@@ -21,7 +21,8 @@ jobs:
         run: |
           sudo mkdir /usr/tools
           sudo git clone --depth=1 https://github.com/opnsense/tools.git /usr/tools
-          sudo cd /usr/tools && make update
+          cd /usr/tools
+          make update
 
       - name: Install pkg
         run: |

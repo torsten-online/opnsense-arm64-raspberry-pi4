@@ -9,8 +9,8 @@ jobs:
   build-freebsd:
     runs-on: ubuntu-latest  # Or a suitable Linux runner
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: FreeBSD-Image-Build
+        uses: vmactions/freebsd-vm@v1.0.8
 
       - name: Download FreeBSD image
         run: |

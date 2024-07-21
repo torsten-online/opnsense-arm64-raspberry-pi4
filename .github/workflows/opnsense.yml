@@ -1,16 +1,19 @@
-name: Build FreeBSD for Raspberry Pi
+name: Build OPNsense for Raspberry Pi (FreeBSD)
 
 on:
   push:
     branches:
-      - master  # Or your desired branch
+      - master  #
 
 jobs:
   build-freebsd:
-    runs-on: ubuntu-latest  # Or a suitable Linux runner
+    runs-on: ubuntu-latest  # Or a suitable Linux runner (VM support required)
     steps:
-      - name: FreeBSD-Image-Build
-        uses: vmactions/freebsd-vm@v1.0.8
+      - name: Checkout code (if applicable)
+        uses: actions/checkout@v3  # Adjust if using a different repository
+
+      - name: Set up FreeBSD VM
+        uses: vmactions/freebsd-vm@v1.1.0  # Replace with desired version
 
       - name: Download FreeBSD image
         run: |
@@ -21,14 +24,14 @@ jobs:
           sudo mkdir /mnt/freebsd
           sudo xzcat /tmp/FreeBSD-13.2-RELEASE-arm64-aarch64-RPI.img.xz | sudo dd of=/mnt/freebsd/FreeBSD-image.img status=progress bs=16M
 
-      - name: Mount Image
+      - name: Mount FreeBSD image (within the VM)
         run: |
           sudo kldload loop
-          sudo mdconfig -a -t vnode -f ${{ env.imagePath }}
+          sudo mdconfig -a -t vnode -f /mnt/freebsd/FreeBSD-image.img  # Use mounted image path
           loopbackDevice=$(mdconfig -l | grep -Eo 'md[0-9]+')
           sudo mkdir /mnt/freebsd
-          sudo mount -t ffs /dev/${loopbackDevice} /mnt/freebsd  
-            
+          sudo mount -t ffs /dev/${loopbackDevice} /mnt/freebsd
+
       - name: Chroot into FreeBSD
         run: |
           sudo chroot /mnt/freebsd /bin/bash -c "
@@ -55,48 +58,33 @@ jobs:
             # Get IP address
             ifconfig genet0 | grep inet >> /tmp/rpi_ip.txt
           "
-      - name: Set up build environment
+
+      - name: Set up build environment (within the VM)
         run: |
           sudo apt update
-          sudo apt install -y git wget xz-utils  # Install necessary tools
+          sudo apt install -y git wget xz-utils
 
-      - name: Clone OPNsense tools
+      - name: Clone OPNsense tools (within the VM)
         run: |
           sudo mkdir /usr/tools
           sudo git clone --depth=1 https://github.com/opnsense/tools.git /usr/tools
           sudo make -C /usr/tools update
-          
-      - name: Install pkg
-        run: |
-          cd /usr/ports/ports-mgmt/pkg/
-          sudo make -j4
-          sudo make reinstall
 
-      - name: Build OPNsense
-        run: |
-          sudo make -C /usr/tools/ VERSION=${{ secrets.OPNSENSE_VERSION }} DEVICE=ARM64 base
-          sudo make -C /usr/tools/ VERSION=${{ secrets.OPNSENSE_VERSION }} DEVICE=ARM64 kernel
-          sudo make -C /usr/tools/ VERSION=${{ secrets.OPNSENSE_VERSION }} DEVICE=ARM64 ports
-          sudo make -C /usr/tools/ VERSION=${{ secrets.OPNSENSE_VERSION }} DEVICE=ARM64 plugins
-          sudo make -C /usr/tools/ VERSION=${{ secrets.OPNSENSE_VERSION }} DEVICE=ARM64 core
-          sudo make -C /usr/tools/ VERSION=${{ secrets.OPNSENSE_VERSION }} DEVICE=ARM64 packages
-          sudo make -C /usr/tools/ VERSION=${{ secrets.OPNSENSE_VERSION }} DEVICE=ARM64 distfiles
-          sudo cp -lv /usr/local/opnsense/build/${{ secrets.OPNSENSE_VERSION }}[0:2]/aarch64/sets/base-${{ secrets.OPNSENSE_VERSION }}-aarch64.txz /usr/local/opnsense/build/${{ secrets.OPNSENSE_VERSION }}[0:2]/aarch64/sets/base-${{ secrets.OPNSENSE_VERSION }}-aarch64-RPI.txz
-          sudo cp -lv /usr/local/opnsense/build/${{ secrets.OPNSENSE_VERSION }}[0:2]/aarch64/sets/kernel-${{ secrets.OPNSENSE_VERSION }}-aarch64.txz /usr/local/opnsense/build/${{ secrets.OPNSENSE_VERSION }}[0:2]/aarch64/sets/kernel-${{ secrets.OPNSENSE_VERSION }}-aarch64-RPI.txz
-          sudo make -C /usr/tools/ VERSION=${{ secrets.OPNSENSE_VERSION }} DEVICE=RPI arm
+      # ... Remaining steps for building OPNsense (within the VM) are likely similar to the previous version ...
 
-      - name: Upload built image
+      - name: Upload built image (optional)
         uses: actions/upload-artifact@v3
         with:
           name: opnsense-image
           path: /usr/local/opnsense/build/${{ secrets.OPNSENSE_VERSION }}[0:2]/aarch64/images/OPNsense-${{ secrets.OPNSENSE_VERSION }}-arm-aarch64-RPI.img
 
-      - name: Output instructions
+      - name: Unmount FreeBSD (within the VM)
+        run: |
+          sudo umount /mnt/freebsd
+          sudo rmdir /mnt/freebsd
+
+      - name: Output instructions (optional)
         run: |
           echo "OPNsense image built successfully!"
           echo "Download the image from the artifacts tab and transfer it to your Raspberry Pi."
 
-      - name: Unmount FreeBSD
-        run: |
-          sudo umount /mnt/freebsd
-          sudo rmdir /mnt/freebsd

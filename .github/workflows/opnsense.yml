@@ -24,7 +24,7 @@ jobs:
 
       # Build OPNsense within FreeBSD VM
       - name: Build OPNsense (within the VM)
-        uses: vmactions/freebsd-vm@v1.1.0  # Replace with desired version
+        uses: vmactions/freebsd-vm@v1.0.8  # Replace with desired version
         with:
           envs: 'FREEBSD_IMAGE_URL ${{ secrets.FREEBSD_IMAGE_URL }} OPNSENSE_VERSION ${{ secrets.OPNSENSE_VERSION }}'  # Add build-required env vars
           usesh: true  # Optional, if your build script uses a shell

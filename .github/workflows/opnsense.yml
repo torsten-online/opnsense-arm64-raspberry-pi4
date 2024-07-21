@@ -29,8 +29,8 @@ jobs:
           envs: 'FREEBSD_IMAGE_URL ${{ secrets.FREEBSD_IMAGE_URL }} OPNSENSE_VERSION ${{ secrets.OPNSENSE_VERSION }}'  # Add build-required env vars
           usesh: true  # Optional, if your build script uses a shell
           prepare: |  # Install necessary packages within the VM
-            sudo pkg update
-            sudo pkg install -y curl build-essential git wget xz-utils subversion # Replace with build dependencies
+            pkg update
+            pkg install -y sudo curl git wget xz
           run: |
             sudo kldload loop
             sudo mdconfig -a -t vnode -f /mnt/freebsd/FreeBSD-image.img  # Use mounted image path (within VM)

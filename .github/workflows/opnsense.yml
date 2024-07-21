@@ -21,10 +21,14 @@ jobs:
           sudo mkdir /mnt/freebsd
           sudo xzcat /tmp/FreeBSD-13.2-RELEASE-arm64-aarch64-RPI.img.xz | sudo dd of=/mnt/freebsd/FreeBSD-image.img status=progress bs=16M
 
-      - name: Mount FreeBSD image
+      - name: Mount Image
         run: |
-          sudo mount -o loop /mnt/freebsd/FreeBSD-image.img /mnt/freebsd
-
+          sudo kldload loop
+          sudo mdconfig -a -t vnode -f ${{ env.imagePath }}
+          loopbackDevice=$(mdconfig -l | grep -Eo 'md[0-9]+')
+          sudo mkdir /mnt/freebsd
+          sudo mount -t ffs /dev/${loopbackDevice} /mnt/freebsd  
+            
       - name: Chroot into FreeBSD
         run: |
           sudo chroot /mnt/freebsd /bin/bash -c "

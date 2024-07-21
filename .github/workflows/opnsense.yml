@@ -9,9 +9,6 @@ jobs:
   build-freebsd:
     runs-on: ubuntu-latest  # Or a suitable Linux runner (VM support required)
     steps:
-      - name: Checkout code (if applicable)
-        uses: actions/checkout@v3  # Adjust if using a different repository
-
       - name: Set up FreeBSD VM
         uses: vmactions/freebsd-vm@v1.0.8  # Replace with desired version
 

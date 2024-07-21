@@ -1,8 +1,7 @@
 opnsense-arm64-raspberry-pi4
 ============================
 
-In conjunction with src.git, ports.git, core.git and plugins.git they
-create sets, packages and images for the OPNsense project.
+This is the final release repo for a working opnsense arm64 release for Raspberry Pi4!
 
 Whats happen here? 
 =========================

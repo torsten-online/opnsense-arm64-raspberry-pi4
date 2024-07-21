@@ -30,7 +30,7 @@ jobs:
           usesh: true  # Optional, if your build script uses a shell
           prepare: |  # Install necessary packages within the VM
             pkg update
-            pkg install -y sudo curl git wget xz
+            pkg install -y sudo curl git wget
           run: |
             sudo kldload loop
             sudo mdconfig -a -t vnode -f /mnt/freebsd/FreeBSD-image.img  # Use mounted image path (within VM)

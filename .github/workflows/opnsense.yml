@@ -7,10 +7,11 @@ on:
 
 jobs:
   build-freebsd:
-    runs-on: ubuntu-latest-arm64  # Or a suitable Linux runner (VM support required)
-    steps:
+      runs-on: ubuntu-latest
+      steps:
       - name: Checkout code (if applicable)
-        uses: actions/checkout@v4  # Adjust if using a different repository
+      - uses: actions/checkout@v2
+      - uses: pguyot/arm-runner-action@v2
 
       # Download FreeBSD image (outside VM)
       - name: Download FreeBSD image

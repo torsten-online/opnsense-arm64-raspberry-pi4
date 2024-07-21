@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-freebsd:
-    runs-on: ubuntu-latest  # Or a suitable Linux runner (VM support required)
+    runs-on: ubuntu-latest-arm64  # Or a suitable Linux runner (VM support required)
     steps:
       - name: Checkout code (if applicable)
         uses: actions/checkout@v4  # Adjust if using a different repository
@@ -31,13 +31,13 @@ jobs:
           prepare: |  # Install necessary packages within the VM
             pkg update
             pkg install -y sudo curl git wget
-          run: |
             sudo kldload loop
+          run: |
             sudo mdconfig -a -t vnode -f /mnt/freebsd/FreeBSD-image.img  # Use mounted image path (within VM)
-            loopbackDevice=$(mdconfig -l | grep -Eo 'md[0-9]+')
+            loopbackDevice=(mdconfig -l | grep -Eo 'md[0-9]+')
             sudo mkdir /mnt/freebsd
-            sudo mount -t ffs /dev/${loopbackDevice} /mnt/freebsd
-            sudo chroot /mnt/freebsd 
+            sudo mount -t ffs /dev/{loopbackDevice} /mnt/freebsd
+            sudo chroot /mnt/freebsd
             echo 'uart_2ndstage=1\nenable_uart=1' | sudo tee -a /boot/config.txt
             echo 'over_voltage=6\narm_freq=2000' | sudo tee -a /boot/config.txt
 

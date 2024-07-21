@@ -92,6 +92,9 @@ jobs:
 
       - name: Create bootable image
         run: |
+          sudo ls -latr /usr/local/opnsense/build
+          sudo ls -latr /usr/local/opnsense/build/${{ secrets.OPNSENSE_VERSION }}[0:2]
+          sudo ls -latr /usr/local/opnsense/build/${{ secrets.OPNSENSE_VERSION }}[0:2]/aarch64/images
           sudo dd if=/usr/local/opnsense/build/${{ secrets.OPNSENSE_VERSION }}[0:2]/aarch64/images/OPNsense-${{ secrets.OPNSENSE_VERSION }}-arm-aarch64-RPI.img of=/tmp/opnsense-rpi4.img bs=1M conv=sync,noerror
           sudo gzip -c /tmp/opnsense-rpi4.img > /tmp/opnsense-rpi4.img.gz
 
